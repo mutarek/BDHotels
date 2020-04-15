@@ -2,6 +2,9 @@ package com.techtrickbd.bdhotels;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,6 +29,7 @@ import com.techtrickbd.bdhotels.adapters.HotelsAdapter;
 import com.techtrickbd.bdhotels.interfaces.HotelsClick;
 import com.techtrickbd.bdhotels.models.Facilities;
 import com.techtrickbd.bdhotels.models.HotelModel;
+import com.techtrickbd.bdhotels.viewmodels.HotelViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,45 +49,36 @@ public class MainActivity extends AppCompatActivity {
     private HotelsClick hotelsClick;
     private Context context;
     private HotelsAdapter hotelsAdapter;
+    private HotelViewModel mhotelViewModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         recyclerView = findViewById(R.id.recyllerView);
-        hotelModelList = new ArrayList<>();
-        list.add("imageone");
-        list.add("imageone");
-        list.add("imageone");
-        list.add("imageone");
-        list.add("imageone");
-        general.add("hellogeneral");
-        general.add("hellogeneral");
-        misc.add("hellomisc");
-        misc.add("hellomisc");
-        misc.add("hellomisc");
-        service.add("helloservice");
-        service.add("helloservice");
-        service.add("helloservice");
-        hotelModel.setDescription("Test desc");
-        hotelModel.setHotelimages((ArrayList<String>) list);
-        hotelModel.setRoom_exist(true);
-        hotelModel.setName("helloname");
-        hotelModel.setRating("4.6");
-        facilities.setExtra("extra");
-        facilities.setGeneral((ArrayList<String>) general);
-        facilities.setInternet(true);
-        facilities.setMiscellaneous((ArrayList<String>) misc);
-        facilities.setParking(false);
-        facilities.setServices((ArrayList<String>) service);
-        hotelModel.setFacilities(facilities);
-        hotelModel.setPrice(1200);
-        hotelModel.setLocation(new GeoPoint(1.2, 1.3));
+        mhotelViewModel = ViewModelProviders.of(this).get(HotelViewModel.class);
+        mhotelViewModel.init();
+        mhotelViewModel.getHotels().observe(this, new Observer<List<HotelModel>>() {
+            @Override
+            public void onChanged(List<HotelModel> hotelModels) {
+                hotelsAdapter.notifyDataSetChanged();
+            }
+        });
 
+        initRecyller();
 
     }
 
-    public void adddata(View view) {
+    private void initRecyller() {
+        hotelsAdapter = new HotelsAdapter( hotelsClick,mhotelViewModel.getHotels().getValue(),this);
+        recyclerView.setAdapter(hotelsAdapter);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+
+    }
+
+    /*public void adddata(View view) {
         collectionReference.add(hotelModel).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
             @Override
             public void onComplete(@NonNull Task<DocumentReference> task) {
@@ -94,9 +89,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-    }
+    }*/
 
-    public void loaddata(View view) {
+    /*public void loaddata(View view) {
         collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -105,16 +100,12 @@ public class MainActivity extends AppCompatActivity {
                         HotelModel hotelModel = document.toObject(HotelModel.class);
                         hotelModel.setFacilities(new Facilities());
                         hotelModelList.add(hotelModel);
-                       hotelsAdapter = new HotelsAdapter(new HotelsClick() {
-                           @Override
-                           public void OnHotelsClick(View hotelView, int hotelPosition) {
+                        hotelsAdapter = new HotelsAdapter(new HotelsClick() {
+                            @Override
+                            public void OnHotelsClick(View hotelView, int hotelPosition) {
 
-                           }
-                       },hotelModelList,context);
-
-                        recyclerView.setAdapter(hotelsAdapter);
-                        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this);
-                        recyclerView.setLayoutManager(linearLayoutManager);
+                            }
+                        }, hotelModelList, context);
 
                     }
                 } else {
@@ -124,8 +115,7 @@ public class MainActivity extends AppCompatActivity {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.d("TAG",""+e.getMessage().toString());
+                Log.d("TAG", "" + e.getMessage().toString());
             }
-        });
-    }
+        });*/
 }

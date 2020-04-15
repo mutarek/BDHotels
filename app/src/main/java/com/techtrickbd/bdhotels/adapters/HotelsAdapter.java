@@ -22,7 +22,7 @@ import java.util.List;
 
 public class HotelsAdapter extends RecyclerView.Adapter<HotelsAdapter.HotelsViewHolder> {
     private HotelsClick hotelsClick;
-    private List<HotelModel> hotelModels;
+    private List<HotelModel> hotelModels = new ArrayList<>();
     private Context context;
 
     public HotelsAdapter(HotelsClick hotelsClick, List<HotelModel> hotelModels, Context context) {
@@ -35,12 +35,12 @@ public class HotelsAdapter extends RecyclerView.Adapter<HotelsAdapter.HotelsView
     @Override
     public HotelsViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        View hotelsView = layoutInflater.inflate(R.layout.samplehotellayout, parent, false);
+        final View hotelsView = layoutInflater.inflate(R.layout.samplehotellayout, parent, false);
         final HotelsViewHolder hotelsViewHolder = new HotelsViewHolder(hotelsView);
         hotelsView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                hotelsClick.OnHotelsClick(parent, hotelsViewHolder.getAdapterPosition());
+                hotelsClick.OnHotelsClick(parent,hotelsViewHolder.getAdapterPosition());
             }
         });
 

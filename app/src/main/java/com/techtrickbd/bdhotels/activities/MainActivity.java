@@ -1,30 +1,19 @@
-package com.techtrickbd.bdhotels;
+package com.techtrickbd.bdhotels.activities;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
-import android.content.LocusId;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.ProgressBar;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.GeoPoint;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.techtrickbd.bdhotels.R;
 import com.techtrickbd.bdhotels.adapters.HotelsAdapter;
 import com.techtrickbd.bdhotels.interfaces.HotelsClick;
 import com.techtrickbd.bdhotels.models.Facilities;
@@ -50,13 +39,14 @@ public class MainActivity extends AppCompatActivity {
     private Context context;
     private HotelsAdapter hotelsAdapter;
     private HotelViewModel mhotelViewModel;
-
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         recyclerView = findViewById(R.id.recyllerView);
+        progressBar = findViewById(R.id.progress_bar);
         mhotelViewModel = ViewModelProviders.of(this).get(HotelViewModel.class);
         mhotelViewModel.init();
         mhotelViewModel.getHotels().observe(this, new Observer<List<HotelModel>>() {
@@ -65,9 +55,28 @@ public class MainActivity extends AppCompatActivity {
                 hotelsAdapter.notifyDataSetChanged();
             }
         });
+        mhotelViewModel.getIsUpdating().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                 if (aBoolean)
+                 {
+                     showProgressbar();
+                 }
+                 else
+                     hideProgressbar();
+            }
+        });
 
         initRecyller();
 
+    }
+
+    private void hideProgressbar() {
+        progressBar.setVisibility(View.INVISIBLE);
+    }
+
+    private void showProgressbar() {
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     private void initRecyller() {
